@@ -57,9 +57,10 @@ class LeastSquaresLinearRegressor(object):
         xtilde_NG = np.hstack([x_NF, np.ones((N, 1))])
         xTx_GG = np.dot(xtilde_NG.T, xtilde_NG)
         
-        theta_G1 = np.linalg.solve(xTx_GG, np.dot(xtilde_NG.T, y_N1))
-        self.w_F = theta_G1[:-1,0]xs
-        self.b = theta_G1[-1,0]
+        theta_G1 = np.linalg.solve(xTx_GG, np.dot(xtilde_NG.T, y_N))
+        #print(theta_G1.shape)
+        self.w_F = theta_G1[:-1]
+        self.b = theta_G1[-1]
         
         pass # TODO - DONE - should I leave the pass here?
 
@@ -103,3 +104,6 @@ if __name__ == '__main__':
     linear_regr.fit(x_NF, y_N)
 
     yhat_N = linear_regr.predict(x_NF)
+    #print(yhat_N)
+    #print("shape")
+    #print(yhat_N.shape)
