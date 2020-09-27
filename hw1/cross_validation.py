@@ -1,4 +1,5 @@
 import numpy as np
+from LeastSquaresLinearRegression import LeastSquaresLinearRegressor # TODO remove this line before submitting and the main function
 
 from performance_metrics import calc_mean_squared_error
 
@@ -136,11 +137,65 @@ def make_train_and_test_row_ids_for_n_fold_cv(
         random_state = np.random.RandomState(int(random_state))
 
     # TODO obtain a shuffled order of the n_examples
-
+    number_of_items_per_fold = int(N/n_folds) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
+    print("~~~~~~~~~~~~~~~~~~")
+    print(int(number_of_items_per_fold))
+    indices = [n for n in range(N)]
+    random_state.shuffle(indices)
     train_ids_per_fold = list()
     test_ids_per_fold = list()
     
-    # TODO establish the row ids that belong to each fold's
-    # train subset and test subset
+    for k in range(n_folds):
+        for i in range(n_folds):
+            if (i == k):
+                test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+            else:
+                train_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+        
+    # TODO establish the row ids that belong to each fold's 
+    # train subset and test subset - DONE
 
     return train_ids_per_fold, test_ids_per_fold
+
+
+
+if __name__ == '__main__': # TODO eliminate the main function
+    # Simple example use case
+    # With toy dataset with N=100 examples
+    # created via a known linear regression model plus small noise
+
+    prng = np.random.RandomState(0)
+    N = 100
+
+    true_w_F = np.asarray([1.1, -2.2, 3.3])
+    true_b = 0.0
+    x_NF = prng.randn(N, 3)
+    y_N = true_b + np.dot(x_NF, true_w_F) + 0.03 * prng.randn(N)
+
+    #linear_regr = LeastSquaresLinearRegressor()
+    #linear_regr.fit(x_NF, y_N)
+    #indices = [n for n in range(N)]
+    #print(indices)
+
+    #print(x_NF)
+    #print(x_NF.shape)
+    #prng.shuffle(indices)
+    #print(indices)
+    #print(x_NF)
+    #print(x_NF.shape)
+    print(list())
+    
+
+    #yhat_N = linear_regr.predict(x_NF)
+    #print(yhat_N)
+    #print("shape")
+    #print(yhat_N.shape)
+    
+    tr_ids_per_fold, te_ids_per_fold = (make_train_and_test_row_ids_for_n_fold_cv(11, 3))
+    #print(tr_ids_per_fold.shape)
+    print(tr_ids_per_fold)
+    print("<---------------------------->")
+    #print(te_ids_per_fold.shape)
+    print(te_ids_per_fold)
+
+
