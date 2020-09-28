@@ -63,6 +63,13 @@ def train_models_and_calc_scores_for_n_fold_cv(
 
     # TODO define the folds here by calling your function
     # e.g. ... = make_train_and_test_row_ids_for_n_fold_cv(...)
+    print("~~~~~~~~~~~~~~~~~~~")
+    print(x_NF.shape)
+    print(y_N.shape)
+    print("~~~~~~~~~~~~~~~~~~~")
+    y_N = y_N.reshape((y_N.shape[0], 1))
+    print(y_N.shape)
+    print("pppppppppppppppppppppppp")
     
     N = x_NF.shape[0]
     # get the indices for training and testing per fold
@@ -73,11 +80,11 @@ def train_models_and_calc_scores_for_n_fold_cv(
         ith_training_xs = list()
         ith_training_ys = list()
         for j in range (n_folds - 1):
-            ith_training_xs = np.append(ith_training_points, x_NF[np.array(tr_ids_per_fold[i][j])]) # TODO change the final 0)
+            ith_training_xs = np.append(ith_training_xs, x_NF[np.array(tr_ids_per_fold[i][j])]) # TODO change the final 0)
             ith_training_ys = np.append(ith_training_ys, y_N[np.array(tr_ids_per_fold[i][j])])
 
         # Now we have all the training points, we can fit our model
-        estimator.fit(ith_training_xs, ith_training_ys)
+        estimator.fit(ith_training_xs, ith_training_ys) # ERROR: Expected 2D array, got 1D array instead
         # we obtain the predictions for the training points
         ith_tr_y_hat = estimator.predict(ith_training_xs)
         # we compute the training error and add it to the train_error_per_fold numpy array
@@ -235,27 +242,43 @@ if __name__ == '__main__': # TODO eliminate the main function
     
     # Create simple dataset of N examples where y given x
     # is perfectly explained by a linear regression model
+    #N = 101
+    #n_folds = 7
+    #x_N3 = np.random.RandomState(0).rand(N, 3)
+    #y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
+    
+    #arr1 = [[np.asarray([1, 2]), np.asarray([3, 4])], 
+    #        [np.asarray([5, 6]), np.asarray([7, 8])]]
+    
+    
+    #arr2 = np.append(arr1[1][0], arr1[1][1])
+    #print(arr2)
+    #print(arr1[1][0])
+                                        
+    
+    #print(arr2[np.array([3, 3, 1, 2])])
+    #train_error_per_fold = np.zeros(2, dtype=np.int32)
+    #print(train_error_per_fold)
+    #print(print(train_error_per_fold).shape)
+    #train_error_per_fold[0] = 1
+    #print(train_error_per_fold)
+    
+     # Create simple dataset of N examples where y given x
+    # is perfectly explained by a linear regression model
     N = 101
     n_folds = 7
     x_N3 = np.random.RandomState(0).rand(N, 3)
     y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
     
-    arr1 = [[np.asarray([1, 2]), np.asarray([3, 4])], 
-            [np.asarray([5, 6]), np.asarray([7, 8])]]
-    
-    
-    arr2 = np.append(arr1[1][0], arr1[1][1])
-    print(arr2)
-    print(arr1[1][0])
-                                        
-    
-    print(arr2[np.array([3, 3, 1, 2])])
-    train_error_per_fold = np.zeros(2, dtype=np.int32)
-    print(train_error_per_fold)
-    #print(print(train_error_per_fold).shape)
-    train_error_per_fold[0] = 1
-    print(train_error_per_fold)
-    
+    import sklearn.linear_model
+    my_regr = sklearn.linear_model.LinearRegression()
+    tr_K, te_K = train_models_and_calc_scores_for_n_fold_cv(my_regr, x_N3, y_N, n_folds=n_folds, random_state=0)
+
+    # Training error should be indistiguishable from zero
+    np.array2string(tr_K, precision=8, suppress_small=True)
+
+    # Testing error should be indistinguishable from zero
+    np.array2string(te_K, precision=8, suppress_small=True)
     
 
 
