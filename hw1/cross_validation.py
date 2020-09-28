@@ -138,19 +138,27 @@ def make_train_and_test_row_ids_for_n_fold_cv(
 
     # TODO obtain a shuffled order of the n_examples
     number_of_items_per_fold = int(N/n_folds) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
-    print("~~~~~~~~~~~~~~~~~~")
-    print(int(number_of_items_per_fold))
+    #print("~~~~~~~~~~~~~~~~~~")
+    #print(int(number_of_items_per_fold))
     indices = [n for n in range(N)]
     random_state.shuffle(indices)
     train_ids_per_fold = list()
     test_ids_per_fold = list()
     
     for k in range(n_folds):
+        #print("k = ", k)
+        kth_training_folds = list()
         for i in range(n_folds):
-            if (i == k):
+            #print("i = ", i)
+            if (i == k): # there will be only one testing fold
                 test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
-            else:
-                train_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+                print("i == k is true / add testing")
+            else: # there will be n_folds - 1 training folds
+                kth_training_folds.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+                print("i == k is false / add training")
+        #print("adding set of training folds to the big list")
+        train_ids_per_fold.append(kth_training_folds)
+        #print("now the train_ids_per_fold has size ", len(train_ids_per_fold))
         
     # TODO establish the row ids that belong to each fold's 
     # train subset and test subset - DONE
@@ -183,7 +191,6 @@ if __name__ == '__main__': # TODO eliminate the main function
     #print(indices)
     #print(x_NF)
     #print(x_NF.shape)
-    print(list())
     
 
     #yhat_N = linear_regr.predict(x_NF)
@@ -192,10 +199,11 @@ if __name__ == '__main__': # TODO eliminate the main function
     #print(yhat_N.shape)
     
     tr_ids_per_fold, te_ids_per_fold = (make_train_and_test_row_ids_for_n_fold_cv(11, 3))
-    #print(tr_ids_per_fold.shape)
-    print(tr_ids_per_fold)
-    print("<---------------------------->")
-    #print(te_ids_per_fold.shape)
-    print(te_ids_per_fold)
+    #print("the size of tr_ids_per_fold is", len(tr_ids_per_fold), "where each element has size ", len(tr_ids_per_fold[0]))
+    #print(tr_ids_per_fold)
+    #print("<---------------------------->")
+    #print("the size of te_ids_per_fold is", len(te_ids_per_fold), "where each element has size ", len(te_ids_per_fold[0]))
+    #print(te_ids_per_fold)
+    
 
 
