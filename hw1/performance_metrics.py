@@ -55,4 +55,9 @@ def calc_mean_absolute_error(y_N, yhat_N):
     0.6666666666666666
     '''
     # return sklearn.metrics.mean_absolute_error(yhat_N, y_N)
+    N = y_N.shape[0]
     return sum(np.abs(y_N - yhat_N))/N  # TODO fixme - DONE
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
