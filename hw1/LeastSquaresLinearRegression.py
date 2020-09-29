@@ -88,22 +88,6 @@ class LeastSquaresLinearRegressor(object):
 
 
 if __name__ == '__main__':
-    # Simple example use case
-    # With toy dataset with N=100 examples
-    # created via a known linear regression model plus small noise
+    import doctest
+    doctest.testmod()
 
-    prng = np.random.RandomState(0)
-    N = 100
-
-    true_w_F = np.asarray([1.1, -2.2, 3.3])
-    true_b = 0.0
-    x_NF = prng.randn(N, 3)
-    y_N = true_b + np.dot(x_NF, true_w_F) + 0.03 * prng.randn(N)
-
-    linear_regr = LeastSquaresLinearRegressor()
-    linear_regr.fit(x_NF, y_N)
-
-    yhat_N = linear_regr.predict(x_NF)
-    #print(yhat_N)
-    #print("shape")
-    #print(yhat_N.shape)
