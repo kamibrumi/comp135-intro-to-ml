@@ -1,5 +1,4 @@
 import numpy as np
-from LeastSquaresLinearRegression import LeastSquaresLinearRegressor # TODO remove this line before submitting and the main function
 
 from performance_metrics import calc_mean_squared_error # was this here??
 
@@ -56,52 +55,41 @@ def train_models_and_calc_scores_for_n_fold_cv(
     >>> np.array2string(te_K, precision=8, suppress_small=True)
     '[0. 0. 0. 0. 0. 0. 0.]'
     '''
-    train_error_per_fold = list() #np.zeros(2, dtype=np.int32)
-    test_error_per_fold = list() #np.zeros(2, dtype=np.int32)
+    train_error_per_fold = list() 
+    test_error_per_fold = list() 
     
-    #for i in range(n_folds):
+    
 
     # TODO define the folds here by calling your function
     # e.g. ... = make_train_and_test_row_ids_for_n_fold_cv(...)
-    print("~~~~~~~~~~~~~~~~~~~")
-    print(x_NF.shape)
-    print(y_N.shape)
-    print("~~~~~~~~~~~~~~~~~~~")
-    y_N = y_N.reshape((y_N.shape[0], 1))
-    print(y_N.shape)
-    print("pppppppppppppppppppppppp")
     
-    N = x_NF.shape[0]
+    
+    y_N = y_N.reshape((y_N.shape[0], 1))
+    
     # get the indices for training and testing per fold
-    tr_ids_per_fold, te_ids_per_fold = make_train_and_test_row_ids_for_n_fold_cv(N, n_folds, random_state)
+    tr_ids_per_fold, te_ids_per_fold = make_train_and_test_row_ids_for_n_fold_cv(x_NF.shape[0], n_folds, random_state)
     
     for i in range(n_folds):
         # concatenate in one array all the training points
         ith_training_xs = list()
         ith_training_ys = list()
-        print("len(ith_training_xs) = ", len(ith_training_xs))
-        print("len(ith_training_ys) = ", len(ith_training_ys))
         for j in range (n_folds - 1):
             indexes = np.array(tr_ids_per_fold[i][j])
-            print(indexes)
+            
             ith_training_xs.extend(x_NF[indexes]) # TODO change the final 0)
             ith_training_ys.extend(y_N[indexes])
-            print("len(ith_training_xs) = ", len(ith_training_xs))
-            print("len(ith_training_ys) = ", len(ith_training_ys))
 
         # Now we have all the training points, we can fit our model
-        #print("SHAPE ERROR ith_training_xs ", ith_training_xs.shape)
-        #print("SHAPE ERROR ith_training_ys ", ith_training_ys.shape)
+        
+        
         ith_training_xs = np.asarray(ith_training_xs)
         ith_training_ys = np.asarray(ith_training_ys)
         
-        print("shape(ith_training_xs) = ", ith_training_xs.shape)
-        print("shape(ith_training_ys) = ", ith_training_ys.shape)
         
         #ith_training_xs = ith_training_xs.reshape((ith_training_xs.shape[0], 1))
         #ith_training_ys = ith_training_ys.reshape((ith_training_ys.shape[0], 1))
         
-        estimator.fit(ith_training_xs, ith_training_ys) # ERROR: Expected 2D array, got 1D array instead
+        estimator.fit(ith_training_xs, ith_training_ys)
         # we obtain the predictions for the training points
         ith_tr_y_hat = estimator.predict(ith_training_xs)
         # we compute the training error and add it to the train_error_per_fold numpy array
@@ -189,113 +177,27 @@ def make_train_and_test_row_ids_for_n_fold_cv(
         random_state = np.random.RandomState(int(random_state))
 
     # TODO obtain a shuffled order of the n_examples
-    number_of_items_per_fold = int(N/n_folds) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
-    #print("~~~~~~~~~~~~~~~~~~")
-    #print(int(number_of_items_per_fold))
-    indices = [n for n in range(N)]
+    number_of_items_per_fold = int(n_examples/n_folds) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
+    indices = [n for n in range(n_examples)]
     random_state.shuffle(indices)
     train_ids_per_fold = list()
     test_ids_per_fold = list()
     
     for k in range(n_folds):
-        #print("k = ", k)
         kth_training_folds = list()
         for i in range(n_folds):
-            #print("i = ", i)
             if (i == k): # there will be only one testing fold
                 test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
-                print("i == k is true / add testing")
             else: # there will be n_folds - 1 training folds
                 kth_training_folds.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
-                print("i == k is false / add training")
-        #print("adding set of training folds to the big list")
+
+
         train_ids_per_fold.append(kth_training_folds)
-        #print("now the train_ids_per_fold has size ", len(train_ids_per_fold))
+
         
     # TODO establish the row ids that belong to each fold's 
     # train subset and test subset - DONE
 
     return train_ids_per_fold, test_ids_per_fold
-
-
-
-if __name__ == '__main__': # TODO eliminate the main function
-    # Simple example use case
-    # With toy dataset with N=100 examples
-    # created via a known linear regression model plus small noise
-
-    #prng = np.random.RandomState(0)
-    #N = 100
-
-    #true_w_F = np.asarray([1.1, -2.2, 3.3])
-    #true_b = 0.0
-    #x_NF = prng.randn(N, 3)
-    #y_N = true_b + np.dot(x_NF, true_w_F) + 0.03 * prng.randn(N)
-
-    #linear_regr = LeastSquaresLinearRegressor()
-    #linear_regr.fit(x_NF, y_N)
-    #indices = [n for n in range(N)]
-    #print(indices)
-
-    #print(x_NF)
-    #print(x_NF.shape)
-    #prng.shuffle(indices)
-    #print(indices)
-    #print(x_NF)
-    #print(x_NF.shape)
-    
-
-    #yhat_N = linear_regr.predict(x_NF)
-    #print(yhat_N)
-    #print("shape")
-    #print(yhat_N.shape)
-    
-    #tr_ids_per_fold, te_ids_per_fold = (make_train_and_test_row_ids_for_n_fold_cv(11, 3))
-    #print("the size of tr_ids_per_fold is", len(tr_ids_per_fold), "where each element has size ", len(tr_ids_per_fold[0]))
-    #print(tr_ids_per_fold)
-    #print("<---------------------------->")
-    #print("the size of te_ids_per_fold is", len(te_ids_per_fold), "where each element has size ", len(te_ids_per_fold[0]))
-    #print(te_ids_per_fold)
-    
-    # Create simple dataset of N examples where y given x
-    # is perfectly explained by a linear regression model
-    #N = 101
-    #n_folds = 7
-    #x_N3 = np.random.RandomState(0).rand(N, 3)
-    #y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
-    
-    #arr1 = [[np.asarray([1, 2]), np.asarray([3, 4])], 
-    #        [np.asarray([5, 6]), np.asarray([7, 8])]]
-    
-    
-    #arr2 = np.append(arr1[1][0], arr1[1][1])
-    #print(arr2)
-    #print(arr1[1][0])
-                                        
-    
-    #print(arr2[np.array([3, 3, 1, 2])])
-    #train_error_per_fold = np.zeros(2, dtype=np.int32)
-    #print(train_error_per_fold)
-    #print(print(train_error_per_fold).shape)
-    #train_error_per_fold[0] = 1
-    #print(train_error_per_fold)
-    
-     # Create simple dataset of N examples where y given x
-    # is perfectly explained by a linear regression model
-    N = 101
-    n_folds = 7
-    x_N3 = np.random.RandomState(0).rand(N, 3)
-    y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
-    
-    import sklearn.linear_model
-    my_regr = sklearn.linear_model.LinearRegression()
-    tr_K, te_K = train_models_and_calc_scores_for_n_fold_cv(my_regr, x_N3, y_N, n_folds=n_folds, random_state=0)
-
-    # Training error should be indistiguishable from zero
-    np.array2string(tr_K, precision=8, suppress_small=True)
-
-    # Testing error should be indistinguishable from zero
-    np.array2string(te_K, precision=8, suppress_small=True)
-    
 
 
