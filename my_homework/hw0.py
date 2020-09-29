@@ -45,7 +45,7 @@ def calc_k_nearest_neighbors(data_NF, query_QF, K=1):
     neighb_QKF = []
 
     for i in range(0, query_QF.shape[0]):
-        v_q = query_QF[i];
+        v_q = query_QF[i]
         dist_qn = [euclidian_distance(v_q, v_n) for v_n in data_NF]
 
         # idxs = np.argpartition(dist_qn, K)

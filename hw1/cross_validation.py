@@ -70,37 +70,39 @@ def train_models_and_calc_scores_for_n_fold_cv(
     tr_ids_per_fold, te_ids_per_fold = make_train_and_test_row_ids_for_n_fold_cv(x_NF.shape[0], n_folds, random_state)
     
     for i in range(n_folds):
-        # concatenate in one array all the training points
-        ith_training_xs = list()
-        ith_training_ys = list()
-        for j in range (n_folds - 1):
-            indexes = np.array(tr_ids_per_fold[i][j])
-            
-            ith_training_xs.extend(x_NF[indexes]) # TODO change the final 0)
-            ith_training_ys.extend(y_N[indexes])
+        indexes_tr = np.array(tr_ids_per_fold[i])
+
+        ith_training_xs = x_NF[indexes_tr]
+        ith_training_ys = y_N[indexes_tr]
 
         # Now we have all the training points, we can fit our model
-        
-        
         ith_training_xs = np.asarray(ith_training_xs)
         ith_training_ys = np.asarray(ith_training_ys)
-        
-        
+
         #ith_training_xs = ith_training_xs.reshape((ith_training_xs.shape[0], 1))
         #ith_training_ys = ith_training_ys.reshape((ith_training_ys.shape[0], 1))
         
+        #ith_training_xs = ith_training_xs.reshape((ith_training_xs.shape[0], 1))
+        #ith_training_ys = ith_training_ys.reshape((ith_training_ys.shape[0], 1))
+        #print("ith_training_xs.shape", ith_training_xs.shape)
+        #print("ith_training_ys.shape", ith_training_ys.shape)
+
+
         estimator.fit(ith_training_xs, ith_training_ys)
         # we obtain the predictions for the training points
         ith_tr_y_hat = estimator.predict(ith_training_xs)
         # we compute the training error and add it to the train_error_per_fold numpy array
-        train_error_per_fold.append(calc_mean_squared_error(ith_training_ys, ith_tr_y_hat))
+        #print("calc_mean_squared_error(ith_training_ys, ith_tr_y_hat)", calc_mean_squared_error(ith_training_ys, ith_tr_y_hat))
+        train_error_per_fold.extend(calc_mean_squared_error(ith_training_ys, ith_tr_y_hat))
         
         # now we compute the testing/cross validation error
-        ith_testing_xs = x_NF[np.array(te_ids_per_fold[i])]
-        ith_testing_ys = y_N[np.array(te_ids_per_fold[i])]
+        indexes_te = np.array(te_ids_per_fold[i])
+        ith_testing_xs = x_NF[indexes_te]
+        ith_testing_ys = y_N[indexes_te]
         
         ith_te_y_hat = estimator.predict(ith_testing_xs)
-        test_error_per_fold.append(calc_mean_squared_error(ith_testing_ys, ith_te_y_hat))
+        #print("calc_mean_squared_error(ith_testing_ys, ith_te_y_hat)", calc_mean_squared_error(ith_testing_ys, ith_te_y_hat))
+        test_error_per_fold.extend(calc_mean_squared_error(ith_testing_ys, ith_te_y_hat))
         
     # TODO loop over folds and compute the train and test error
     # for the provided estimator
@@ -177,7 +179,9 @@ def make_train_and_test_row_ids_for_n_fold_cv(
         random_state = np.random.RandomState(int(random_state))
 
     # TODO obtain a shuffled order of the n_examples
-    number_of_items_per_fold = int(n_examples/n_folds) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
+    number_of_items_per_fold = int(np.ceil(n_examples/n_folds)) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
+    #print("number_of_items_per_fold", number_of_items_per_fold)
+    #print("number_of_items_per_fold CEIL", int(np.ceil(n_examples/n_folds)))
     indices = [n for n in range(n_examples)]
     random_state.shuffle(indices)
     train_ids_per_fold = list()
@@ -189,7 +193,7 @@ def make_train_and_test_row_ids_for_n_fold_cv(
             if (i == k): # there will be only one testing fold
                 test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
             else: # there will be n_folds - 1 training folds
-                kth_training_folds.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+                kth_training_folds.extend(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
 
 
         train_ids_per_fold.append(kth_training_folds)
@@ -201,3 +205,38 @@ def make_train_and_test_row_ids_for_n_fold_cv(
     return train_ids_per_fold, test_ids_per_fold
 
 
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
+
+    # N = 11
+    # n_folds = 3
+    # tr_ids_per_fold, te_ids_per_fold = (make_train_and_test_row_ids_for_n_fold_cv(N, n_folds))
+    # print(len(tr_ids_per_fold))
+    # #3
+    #
+    # # Count of items in training sets
+    # print("sort", np.sort([len(tr) for tr in tr_ids_per_fold]))
+    # print("tr_ids_per_fold", tr_ids_per_fold)
+    #array([7, 7, 8])
+
+    # N = 101
+    # n_folds = 7
+    # x_N3 = np.random.RandomState(0).rand(N, 3)
+    # y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
+    # y_N.shape
+    # #(101,)
+    #
+    # import sklearn.linear_model
+    # my_regr = sklearn.linear_model.LinearRegression()
+    # tr_K, te_K = train_models_and_calc_scores_for_n_fold_cv(
+    #
+    # my_regr, x_N3, y_N, n_folds = n_folds, random_state = 0)
+    #
+    # # Training error should be indistiguishable from zero
+    # print(np.array2string(tr_K, precision=8, suppress_small=True))
+    # #'[0. 0. 0. 0. 0. 0. 0.]'
+    #
+    # # Testing error should be indistinguishable from zero
+    # print(np.array2string(te_K, precision=8, suppress_small=True))
+    # #'[0. 0. 0. 0. 0. 0. 0.]'
