@@ -56,8 +56,8 @@ def train_models_and_calc_scores_for_n_fold_cv(
     >>> np.array2string(te_K, precision=8, suppress_small=True)
     '[0. 0. 0. 0. 0. 0. 0.]'
     '''
-    train_error_per_fold = np.zeros(2, dtype=np.int32)
-    test_error_per_fold = np.zeros(2, dtype=np.int32)
+    train_error_per_fold = list() #np.zeros(2, dtype=np.int32)
+    test_error_per_fold = list() #np.zeros(2, dtype=np.int32)
     
     #for i in range(n_folds):
 
@@ -79,28 +79,45 @@ def train_models_and_calc_scores_for_n_fold_cv(
         # concatenate in one array all the training points
         ith_training_xs = list()
         ith_training_ys = list()
+        print("len(ith_training_xs) = ", len(ith_training_xs))
+        print("len(ith_training_ys) = ", len(ith_training_ys))
         for j in range (n_folds - 1):
-            ith_training_xs = np.append(ith_training_xs, x_NF[np.array(tr_ids_per_fold[i][j])]) # TODO change the final 0)
-            ith_training_ys = np.append(ith_training_ys, y_N[np.array(tr_ids_per_fold[i][j])])
+            indexes = np.array(tr_ids_per_fold[i][j])
+            print(indexes)
+            ith_training_xs.extend(x_NF[indexes]) # TODO change the final 0)
+            ith_training_ys.extend(y_N[indexes])
+            print("len(ith_training_xs) = ", len(ith_training_xs))
+            print("len(ith_training_ys) = ", len(ith_training_ys))
 
         # Now we have all the training points, we can fit our model
+        #print("SHAPE ERROR ith_training_xs ", ith_training_xs.shape)
+        #print("SHAPE ERROR ith_training_ys ", ith_training_ys.shape)
+        ith_training_xs = np.asarray(ith_training_xs)
+        ith_training_ys = np.asarray(ith_training_ys)
+        
+        print("shape(ith_training_xs) = ", ith_training_xs.shape)
+        print("shape(ith_training_ys) = ", ith_training_ys.shape)
+        
+        #ith_training_xs = ith_training_xs.reshape((ith_training_xs.shape[0], 1))
+        #ith_training_ys = ith_training_ys.reshape((ith_training_ys.shape[0], 1))
+        
         estimator.fit(ith_training_xs, ith_training_ys) # ERROR: Expected 2D array, got 1D array instead
         # we obtain the predictions for the training points
         ith_tr_y_hat = estimator.predict(ith_training_xs)
         # we compute the training error and add it to the train_error_per_fold numpy array
-        train_error_per_fold[i] = calc_mean_squared_error(ith_training_ys, ith_y_hat)
+        train_error_per_fold.append(calc_mean_squared_error(ith_training_ys, ith_tr_y_hat))
         
         # now we compute the testing/cross validation error
         ith_testing_xs = x_NF[np.array(te_ids_per_fold[i])]
         ith_testing_ys = y_N[np.array(te_ids_per_fold[i])]
         
         ith_te_y_hat = estimator.predict(ith_testing_xs)
-        test_error_per_fold[i] = calc_mean_squared_error(ith_testing_ys, ith_te_y_hat)
+        test_error_per_fold.append(calc_mean_squared_error(ith_testing_ys, ith_te_y_hat))
         
     # TODO loop over folds and compute the train and test error
     # for the provided estimator
 
-    return train_error_per_fold, test_error_per_fold
+    return np.asarray(train_error_per_fold), np.asarray(test_error_per_fold)
 
 
 def make_train_and_test_row_ids_for_n_fold_cv(

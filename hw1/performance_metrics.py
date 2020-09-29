@@ -26,6 +26,7 @@ def calc_mean_squared_error(y_N, yhat_N):
     1.3333333333333333
     '''
     # return sklearn.metrics.mean_squared_error(yhat_N, y_N)
+    N = y_N.shape[0]
     return sum(np.power(y_N - yhat_N, 2))/N  # TODO fixme - DONE
 
 
