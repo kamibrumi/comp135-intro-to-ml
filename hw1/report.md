@@ -32,7 +32,7 @@ remains the best choice.
 Answer: To answer this, I created a table that shows the degrees of the
 polynomials with their corresponding errors:
 
-![](figure1_table1.png)
+![](figure1_table1_3decimals.png)
 
 The training error of the degree 6 polynomial is approx. 0.2999, while the training error for
 the degree 7 polynomial is approx. 0.0138. Thus, I can say that at degree 6 the training
@@ -45,7 +45,7 @@ is a more flexible model that overfits the training more closely than the degree
 Answer: I removed the scaling step from the pipeline to empirically see what happens, and here is a table with
 the degrees vs the errors
 
-![](figure1_table2.png)
+![](figure1_table2_3decimals.png)
 
 Apparently, the training error does not decrease so dramatically as it did in the case when 
 the pipeline was doing the scaling step. This happens because the data measured for the 
@@ -73,3 +73,56 @@ These values may occur because there is collinearity between the variables.
 ## Problem 2: Polynomial Regression - Model Selection with Cross-Validation
 
 ![](figure2-err_vs_degree-cv-seed=12345.jpg)
+*Figure 2: Line plot of mean-squared error on y-axis vs. 
+polynomial degree on x-axis. On one hand, the error on training set 
+(dotted blue line) is strictly decreasing as the degree
+ of the polynomial increases. On the other hand, the error 
+ on validation set (solid red line with square 
+markers) is decreasing until the polynomial reaches degree 2,
+then it increases as the degree also increases.*
+
+
+
+### Short Answer 2a
+> If your goal is to select hyperparameters for your pipeline that will generalize well to new data from the same distribution, which polynomial degree do you recommend based on this assessment? Are there other degrees that seem to give nearly the same performance? What (if anything) changed from 1a?
+
+I would recommend degree 2 again, just like in 1a. The degree 1 polynomial seems to give
+nearly the same performance, but it's worse than in the quadratic case. The difference 
+with Figure 1 is that in Figure 2 the testing error grows even faster. Past the 
+degree 3, the testing MSE already tends to infinite.
+
+### Short Answer 2b
+> What are two benefits of using cross validation when compared to a fixed validation set (as in Problem 1)?
+
+First, cross validation reduces the variability of the MSE compared with the fixed validation
+set, i.e. if the training set is slightly altered, the MSE will be barely changed, which is not the
+case of the fixed validation set (this is explained in the ISL book, page 178).
+
+Second, cross validation tends to better estimate the error, while the fixed validation set
+approach tends to overestimate it since in this approach the
+training set used to fit the statistical learning method contains only half
+the observations of the entire data set.
+
+### Short Answer 2c
+> What are two drawbacks to using cross validation when compared to a fixed validation set (as in Problem 1)?
+
+First, cross-validation is computationally more expensive than the fixed validation approach.
+This is because in cross validation we have to train k models and asses their training and testing errors, 
+while in the fixed validation set we only train one model.
+
+Second, in some cases we have clustered/hierarchical/grouped data, in which it is hard to 
+split them into k folds without them overlapping. If overlapping the data in two different
+ folds happens, this could cause underestimates of the MSE since there will be datapoints
+ in one of the training folds that also falls in the validation fold. (I found this interesting
+ article about why we are still using Hold-out validation nowadays: 
+ https://stats.stackexchange.com/questions/104713/hold-out-validation-vs-cross-validation/104750#104750).
+ 
+### Short Answer 2d
+> Remember, your task is to develop models that will accurately predict miles per gallon given some basic features of car engines. Suppose your available data is augmented so that each example is associated with a specific manufacturer (e.g. each row of your development set could be labeled 'Toyota' or 'Ford' or 'Hyundai'). You have data labeled with 10 different manufacturers. You'd like your prediction to be accurate for new manufacturers, that you do not have available in your training set. (Thus, your regression model should not use manufacturer label as a feature). How would you suggest we change our cross validation procedure to do better at this task?
+
+I would suggest making sure that in each fold of the cross validation data from all
+10 manufacturers is included, in this way when, when the model is being trained, it is not
+specific to only one or two manufacturers, but it will accurately predict for all the manufacturers,
+and hopefully also for the manufacturers that the model hasn't seen.
+
+## Problem 3: Polynomial Regression with L2 Regularization - Model Selection with Cross-Validation
