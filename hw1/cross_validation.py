@@ -55,6 +55,9 @@ def train_models_and_calc_scores_for_n_fold_cv(
     >>> np.array2string(te_K, precision=8, suppress_small=True)
     '[0. 0. 0. 0. 0. 0. 0.]'
     '''
+    x_NF.astype(np.float64)
+    y_N.astype(np.float64)
+
     train_error_per_fold = list() 
     test_error_per_fold = list() 
     
@@ -107,7 +110,7 @@ def train_models_and_calc_scores_for_n_fold_cv(
     # TODO loop over folds and compute the train and test error
     # for the provided estimator
 
-    return np.asarray(train_error_per_fold), np.asarray(test_error_per_fold)
+    return np.asarray(train_error_per_fold).astype(np.float64), np.asarray(test_error_per_fold).astype(np.float64)
 
 
 def make_train_and_test_row_ids_for_n_fold_cv(
@@ -180,6 +183,8 @@ def make_train_and_test_row_ids_for_n_fold_cv(
 
     # TODO obtain a shuffled order of the n_examples
     number_of_items_per_fold = int(np.ceil(n_examples/n_folds)) # TODO: not sure if I should use ceil or the lower bound, see if I pass tests like this
+
+    # I could have used np.split(indices, n_folds) instead. That would have avoided the above line. USE https://numpy.org/doc/stable/reference/generated/numpy.array_split.html
     #print("number_of_items_per_fold", number_of_items_per_fold)
     #print("number_of_items_per_fold CEIL", int(np.ceil(n_examples/n_folds)))
     indices = [n for n in range(n_examples)]
