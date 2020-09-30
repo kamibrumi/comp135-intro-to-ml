@@ -187,8 +187,12 @@ def make_train_and_test_row_ids_for_n_fold_cv(
     # I could have used np.split(indices, n_folds) instead. That would have avoided the above line. USE https://numpy.org/doc/stable/reference/generated/numpy.array_split.html
     #print("number_of_items_per_fold", number_of_items_per_fold)
     #print("number_of_items_per_fold CEIL", int(np.ceil(n_examples/n_folds)))
-    indices = [n for n in range(n_examples)]
+    indices = np.asarray([n for n in range(n_examples)])
     random_state.shuffle(indices)
+
+    # split the indices array into folds
+    indices_split = np.array_split(indices, n_folds)
+    #print(indices_split)
     train_ids_per_fold = list()
     test_ids_per_fold = list()
     
@@ -196,9 +200,11 @@ def make_train_and_test_row_ids_for_n_fold_cv(
         kth_training_folds = list()
         for i in range(n_folds):
             if (i == k): # there will be only one testing fold
-                test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+                test_ids_per_fold.append(indices_split[i])
+                #test_ids_per_fold.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
             else: # there will be n_folds - 1 training folds
-                kth_training_folds.extend(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
+                kth_training_folds.extend(indices_split[i])
+                #kth_training_folds.append(np.asarray([j for j in indices[i*number_of_items_per_fold:number_of_items_per_fold*(i+1)]]))
 
 
         train_ids_per_fold.append(kth_training_folds)
@@ -225,8 +231,8 @@ if __name__ == "__main__":
     # print("tr_ids_per_fold", tr_ids_per_fold)
     #array([7, 7, 8])
 
-    # N = 101
-    # n_folds = 7
+    # N = 11
+    # n_folds = 3
     # x_N3 = np.random.RandomState(0).rand(N, 3)
     # y_N = np.dot(x_N3, np.asarray([1., -2.0, 3.0])) - 1.3337
     # y_N.shape
