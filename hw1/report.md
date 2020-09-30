@@ -35,7 +35,7 @@ polynomials with their corresponding errors:
 ![](figure1_table1.png)
 
 The training error of the degree 6 polynomial is approx. 0.2999, while the training error for
-the degree 7 polynomial is approx. 0.0138. Thus, we can say that at degree 6 the training
+the degree 7 polynomial is approx. 0.0138. Thus, I can say that at degree 6 the training
 MSE becomes very close to 0. The degree 7 polynomial has a lower training error since it
 is a more flexible model that overfits the training more closely than the degree 6 one.
 
@@ -64,7 +64,12 @@ magnitudes such as the cylinders feature. To supress this effect, we need to bri
 ### Short Answer 1d
 > Consider the model with degree 6. Print out its intercept coeficient value, as well as the minimum and maximum weight coeficient value (out of all the features). What do you notice about these values? How might they be connected to the training and validation set performance you observe in Figure 1?
 
-- The intercept is 1,2901,120,738.129,
-- Min Weight is -9693939910344.908, which corresponds
-- Max weight is 5546402397351.329
+- The intercept of the 6th degree polynomial is 1,2901,120,738.129
+- Min weight of the 6th degree polynomial is -9,693,939,910,344.908, which corresponds to the cylinders^4 feature
+- Max weight of the 6th degree polynomial is 5,546,402,397,351.329, and it corresponds to the cylinders^3 feature
 
+These values may occur because there is collinearity between the variables.
+
+## Problem 2: Polynomial Regression - Model Selection with Cross-Validation
+
+![](figure2-err_vs_degree-cv-seed=12345.jpg)
