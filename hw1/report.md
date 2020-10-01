@@ -126,3 +126,32 @@ specific to only one or two manufacturers, but it will accurately predict for al
 and hopefully also for the manufacturers that the model hasn't seen.
 
 ## Problem 3: Polynomial Regression with L2 Regularization - Model Selection with Cross-Validation
+
+![](figure3-3_panels_by_alpha-err_vs_degree-seed=12345_screenshot.png)
+*Figure 3: Plot of the training (dotted blue line with diamond markers) and validation error (solid red line with square markers) as a function of degree, for 3 possible alpha values: 1e-5, 0.1, and 1000. In the first plot, where alpha is 1e-05, the training error is strictly decreasing, but the testing error 
+decreases until degree 2, then it increases. In the other two plots, both errors decrease as
+the degree increases, with the slight difference that when alpha is 1000, both errors are
+very almost identical.*
+
+### Short Answer 3a
+> If your goal is to select hyperparameters for your pipeline that will generalize well to new data from the same distribution, which polynomial degree and alpha values do you recommend based on this assessment? Are there other values that seem to give nearly the same performance?
+
+In order to answer this question, I can observe that the error lines are way lower in the 
+first two plots, thus I will choose either alpha = 1e-05 or alpha = 0.1. In both plots, the degree
+2 polynomial seem to do a pretty good job at not overfitting the data, thus I print the
+values of the MSE for the degree 2 polynomials for both alphas. The testing errors were 
+15.99099977 and 15.43920962 for the quadratic models with alpha = 10^(-5) and 
+alpha = 0.1, respectively. Hence the model that I choose is the one with lower testing MSE, 
+i.e. the quadratic model with alpha = 0.1. (This also answers the second question: the competing
+model is the quadratic model with alpha = 1e-05).
+
+### Short Answer 3b
+> Your colleague suggests that you can determine the regularization strength alpha by minimizing the following loss on the training set: 
+> ... What value of α would you pick if you did this? Why is this problematic if your goal is to generalize to new data well?
+
+Since this minimization problem also depends on alpha, alpha >= 0 and all the terms in both sums are positive, I would choose alpha = 0.
+This is problematic because I will basically obtain the same coefficients as in least squares. This is problematic when the
+goal is to generalize to new data because of the variability of the error estimate of the linear regression.
+
+## Problem 4: Comparison of methods on the test set
+
