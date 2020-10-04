@@ -1,6 +1,24 @@
 # Homework # 1
 Camelia D. Brumar
 
+#### Table of contents
+
+1. [Problem 1: Polynomial Regression - Model Selection on a Fixed Validation Set](/#problem-1-polynomial-regression---model-selection-on-a-fixed-validation-set)
+    - [Short Answer 1a](#short-answer-1a)
+    - [Short Answer 1b](#short-answer-1b)
+    - [Short Answer 1c](#short-answer-1c)
+    - [Short Answer 1d](#short-answer-1d)
+2. [Problem 2: Polynomial Regression - Model Selection with Cross-Validation](#problem-2-polynomial-regression---model-selection-with-cross-validation)
+    - [Short Answer 2a](#short-answer-2a)
+    - [Short Answer 2b](#short-answer-2b)
+    - [Short Answer 2c](#short-answer-2c)
+    - [Short Answer 2d](#short-answer-2d)
+3. [Problem 3: Polynomial Regression with L2 Regularization - Model Selection with Cross-Validation](#problem-3-polynomial-regression-with-l2-regularization---model-selection-with-cross-validation)
+    - [Short Answer 3a](#short-answer-3a)
+    - [Short Answer 3b](#short-answer-3b)
+    
+4. [Problem 4: Comparison of methods on the test set](#problem-4-comparison-of-methods-on-the-test-set)
+
 ## Problem 1: Polynomial Regression - Model Selection on a Fixed Validation Set
 
 ![](figure1-err_vs_degree-fv.png)
@@ -11,6 +29,8 @@ polynomial degree on x-axis. On one hand, the error on training set
  on validation set (solid red line with square 
 markers) is decreasing until the polynomial reaches degree 2,
 then it increases as the degree also increases.*
+
+<div style="page-break-after: always"></div>
 
 ### Short Answer 1a
 > If your goal is to select a model that will generalize well to new data from the same distribution, which polynomial degree do you recommend based on this assessment? Are there other degrees that seem to give nearly the same performance?
@@ -154,4 +174,16 @@ This is problematic because I will basically obtain the same coefficients as in 
 goal is to generalize to new data because of the variability of the error estimate of the linear regression.
 
 ## Problem 4: Comparison of methods on the test set
+![](figure4.png)
 
+I can conclude from this table that the RMSE decreases from the baseline model to linear regression
+with a fixed validation set, to linear regression with 10-fold cross-validation, and to Ridge regression with
+10-fold cross-validation.
+
+The baseline model has clearly the higher error because it always predicts the same value (the mean value of the trianing ys).
+Linear regression with a fixed validation set predicts better than the baseline model because
+it is more flexible and tries to learn the points with their response. The linear regression model with 10-fold CV has a lower rmse than
+the one with a fixed validation set, since the former was trained on less data than the 10-fold CV one. Finally, ridge + 10-fold
+CV has a lower error than the linear regression model + 10-fold validation error because the number
+of training observations (about 200) is not much more higher than the number of features (4), which may introduce a lot of variability
+in the least squares fit, thing that does not happen when we apply shrinkage methods such as ridge.
