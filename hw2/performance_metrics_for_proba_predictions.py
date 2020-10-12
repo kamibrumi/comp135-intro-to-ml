@@ -92,6 +92,10 @@ def calc_mean_binary_cross_entropy_from_probas(ytrue_N, yproba1_N):
     # Cast labels to integer just to be sure we're getting what's expected
     ytrue_N = np.asarray(ytrue_N, dtype=np.int32)
     N = int(ytrue_N.size)
+
+    if N == 0:
+        return 0.0  # special case: empty array should be 0
+
     # Cast probas to float and be sure we're between zero and one
     yproba1_N = np.asarray(yproba1_N, dtype=np.float64)           # dont touch
     yproba1_N = np.maximum(1e-14, np.minimum(1-1e-14, yproba1_N)) # dont touch
@@ -193,7 +197,13 @@ def calc_mean_binary_cross_entropy_from_scores(ytrue_N, scores_N):
     # See HW2 instructions on website for the math
     yflippedsign_N = -1 * np.sign(ytrue_N-0.001)
     log_e_of_2 = np.log2(2)/np.log2(np.exp(1))
+    np_scores_N = np.asarray(scores_N, dtype=np.float64)
 
     # TODO fixme
-    # Be sure to use scipy_logsumexp were needed
-    return np.sum(logsumexp([0,yflippedsign_N*scores_N]))/(N*log_e_of_2)
+    # Be sure to use scipy_logsumexp where needed
+    return np.sum(scipy_logsumexp(np.concatenate(([0], yflippedsign_N*np_scores_N), axis=0)))/(N*log_e_of_2)
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()

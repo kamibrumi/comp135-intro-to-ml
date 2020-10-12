@@ -72,4 +72,9 @@ def my_logsumexp(scores_N):
     N = scores_N.shape[0]
     updated_scores_N = scores_N - m*np.ones(N)
     
-    return m + np.log2(np.sum(np.exp(new_scores_N)))
+    return m + np.log(np.sum(np.exp(updated_scores_N)))
+
+
+if __name__ == "__main__":
+    import doctest
+    doctest.testmod()
