@@ -68,4 +68,8 @@ def my_logsumexp(scores_N):
 
     # TODO compute logsumexp in numerically stable way
     # See math on HW2 instructions page for the correct approach
-    return 0.0
+    m = np.max(scores_N)
+    N = scores_N.shape[0]
+    updated_scores_N = scores_N - m*np.ones(N)
+    
+    return m + np.log2(np.sum(np.exp(new_scores_N)))
