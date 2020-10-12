@@ -192,7 +192,8 @@ def calc_mean_binary_cross_entropy_from_scores(ytrue_N, scores_N):
     # Convert binary y values so 0 becomes +1 and 1 becomes -1
     # See HW2 instructions on website for the math
     yflippedsign_N = -1 * np.sign(ytrue_N-0.001)
+    log_e_of_2 = np.log2(2)/np.log2(np.exp(1))
 
     # TODO fixme
     # Be sure to use scipy_logsumexp were needed
-    return 0.0
+    return np.sum(logsumexp([0,yflippedsign_N*scores_N]))/(N*log_e_of_2)
