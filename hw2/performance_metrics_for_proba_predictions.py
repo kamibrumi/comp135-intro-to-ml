@@ -189,6 +189,7 @@ def calc_mean_binary_cross_entropy_from_scores(ytrue_N, scores_N):
     '''
     # Cast labels to integer just to be sure we're getting what's expected
     ytrue_N = np.asarray(ytrue_N, dtype=np.int32)
+    np_scores_N = np.asarray(scores_N, dtype=np.float64)
     N = int(ytrue_N.size)
     if N == 0:
         return 0.0 # special case: empty array should be 0
@@ -197,11 +198,18 @@ def calc_mean_binary_cross_entropy_from_scores(ytrue_N, scores_N):
     # See HW2 instructions on website for the math
     yflippedsign_N = -1 * np.sign(ytrue_N-0.001)
     log_e_of_2 = np.log2(2)/np.log2(np.exp(1))
-    np_scores_N = np.asarray(scores_N, dtype=np.float64)
 
     # TODO fixme
     # Be sure to use scipy_logsumexp where needed
-    return np.sum(scipy_logsumexp(np.concatenate(([0], yflippedsign_N*np_scores_N), axis=0)))/(N*log_e_of_2)
+    #return np.sum(scipy_logsumexp(np.concatenate(([0], yflippedsign_N*np_scores_N), axis=0)))/(N*log_e_of_2)
+
+    to_sum = []
+    for i in range(N):
+        arr = np.asarray([0], dtype=np.float64)
+        arr1 = np.concatenate((arr, np.asarray([yflippedsign_N[i] * np_scores_N[i]], dtype=np.float64)), axis=0) # raised error:  TypeError: only integer scalar arrays can be converted to a scalar index
+        to_sum.append(scipy_logsumexp(arr1))
+    return np.sum(to_sum)/(N*log_e_of_2)
+
 
 
 if __name__ == "__main__":
