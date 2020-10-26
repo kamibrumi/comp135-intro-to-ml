@@ -1,6 +1,7 @@
 import numpy as np
-
-from performance_metrics import calc_mean_squared_error
+import sklearn.metrics
+import sklearn
+from performance_metrics_for_proba_predictions import calc_mean_binary_cross_entropy_from_probas
 
 
 def train_models_and_calc_scores_for_n_fold_cv(
@@ -64,6 +65,10 @@ def train_models_and_calc_scores_for_n_fold_cv(
 
     train_error_rate_per_fold = np.zeros(n_folds, dtype=np.float64)
     test_error_rate_per_fold = np.zeros(n_folds, dtype=np.float64)
+    
+    train_bce_per_fold = np.zeros(n_folds, dtype=np.float64)
+    test_bce_per_fold = np.zeros(n_folds, dtype=np.float64)
+    
     for fold_id in range(n_folds):
         trai_ids = tr_ids_per_fold[fold_id]
         x_tr = x_NF[trai_ids].copy()
@@ -86,7 +91,7 @@ def train_models_and_calc_scores_for_n_fold_cv(
         train_bce_per_fold[fold_id] = calc_mean_binary_cross_entropy_from_probas(y_tr, yhat_tr)
         test_bce_per_fold[fold_id] = calc_mean_binary_cross_entropy_from_probas(y_te, yhat_te)
         
-    return train_error_per_fold, test_error_per_fold, train_bce_per_fold, test_bce_per_fold
+    return train_error_rate_per_fold, test_error_rate_per_fold, train_bce_per_fold, test_bce_per_fold
 
 
 def make_train_and_test_row_ids_for_n_fold_cv(
