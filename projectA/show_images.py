@@ -36,7 +36,7 @@ def show_images(X, y, row_ids, n_rows=3, n_cols=3):
 
     for ii, row_id in enumerate(row_ids):
         cur_ax = axes.flatten()[ii]
-        cur_ax.imshow(X[row_id].reshape(28,28), interpolation='nearest', vmin=0, vmax=1, cmap='gray')
+        cur_ax.imshow(X[row_id].reshape(26,26), interpolation='nearest', vmin=0, vmax=1, cmap='gray')
         cur_ax.set_xticks([])
         cur_ax.set_yticks([])
         cur_ax.set_title('y=%d' % y[row_id])
