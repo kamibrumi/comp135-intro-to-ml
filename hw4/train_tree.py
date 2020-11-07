@@ -52,8 +52,8 @@ def train_tree_greedy(
             return LeafNode(x_NF, y_N)
         else:
             # TODO recursively call train_tree_greedy to build the left child
-            left_child = None # TODO fixme
+            left_child = train_tree_greedy(x_LF, y_L, depth + 1) # TODO fixme DONE
             # TODO recursively call train_tree_greedy to build the right child
-            right_child = None # TODO fixme
+            right_child = train_tree_greedy(x_RF, y_R, depth + 1) # TODO fixme DONE
             return InternalDecisionNode(
                 x_NF, y_N, feat_id, thresh_val, left_child, right_child)
