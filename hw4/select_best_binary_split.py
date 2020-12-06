@@ -4,7 +4,6 @@ from tree_utils import LeafNode, InternalDecisionNode
 
 def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     ''' Determine best single feature binary split for provided dataset
-
     Args
     ----
     x_NF : 2D array, shape (N,F) = (n_examples, n_features)
@@ -13,7 +12,6 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         Training labels at current node.
     min_samples_leaf : int
         Minimum number of samples allowed at any leaf.
-
     Returns
     -------
     feat_id : int or None, one of {0, 1, 2, .... F-1}
@@ -30,7 +28,6 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         Training data features assigned to right child using best split.
     y_R : 1D array, shape (R,)
         Training labels assigned to right child using best split.
-
     Examples
     --------
     # Example 1a: Simple example with F=1 and sorted features input
@@ -43,7 +40,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     0
     >>> thresh_val
     2.5
-
+    
     # Example 1b: Same as 1a but just scramble the order of x
     # Should give same results as 1a
     >>> x_NF = np.asarray([2.0, 1.0, 0.0, 3.0, 5.0, 4.0]).reshape((6, 1))
@@ -53,7 +50,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     0
     >>> thresh_val
     2.5
-
+    
     # Example 2: Advanced example with F=12 total features
     # Fill the features such that middle column is same as 1a above,
     # but the first 6 columns with random features
@@ -69,7 +66,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     6
     >>> thresh_val
     2.5
-
+    
     # Example 3: binary split isn't possible (because all x same)
     >>> N = 5
     >>> F = 1
@@ -78,7 +75,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     >>> feat_id, thresh_val, _, _, _, _ = select_best_binary_split(x_NF, y_N)
     >>> feat_id is None
     True
-
+    
     # Example 4: binary split isn't possible (because all y same)
     >>> N = 5
     >>> F = 3
@@ -114,10 +111,30 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         # TODO Compute total cost at each possible threshold
         # Hint: You may need several lines of code, and maybe a for loop.
         # Your goal is *correctness*, don't prioritize speed or efficiency yet.
-        left_yhat_V = np.zeros(V) # TODO fixme
-        right_yhat_V = np.ones(V) # TODO fixme
+        #left_yhat_V = np.zeros(V) # TODO fixme
+        #right_yhat_V = np.zeros(V) # TODO fixme
         left_cost_V = np.zeros(V) # TODO fixme
-        right_cost_V = np.ones(V) # TODO fixme
+        right_cost_V = np.zeros(V) # TODO fixme
+        
+        for v_idx in range(V): # iterate through all the possible splits
+            #print('TEST')
+            # creating masks to pick elements that go to the left or to the right child
+            left_mask_N = x_NF[:, f] < possib_xthresh_V[v_idx]
+            right_mask_N = np.logical_not(left_mask_N)
+
+            # creating the left and the right children
+            left_leaf = LeafNode(x_NF[left_mask_N], y_N[left_mask_N])
+            right_leaf = LeafNode(x_NF[right_mask_N], y_N[right_mask_N])
+
+            left_yhat_V = left_leaf.predict(x_NF[left_mask_N])
+            right_yhat_V = right_leaf.predict(x_NF[right_mask_N])
+
+            
+            left_cost_V[v_idx] = np.sum(np.square(left_yhat_V - y_N[left_mask_N]))
+            right_cost_V[v_idx] = np.sum(np.square(right_yhat_V - y_N[right_mask_N]))
+            #print('left_cost_V', left_cost_V[v_idx])
+            #print('right_cost_V', right_cost_V[v_idx])
+        
         total_cost_V = left_cost_V + right_cost_V
 
         # Check if there is any split that improves our cost or predictions.
@@ -130,7 +147,7 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
             continue
         
         # TODO pick out the split candidate that has best cost
-        chosen_v_id = -1 # TODO fixme
+        chosen_v_id = np.argmin(total_cost_V) # TODO fixme
         cost_F[f] = total_cost_V[chosen_v_id]
         thresh_val_F[f] = possib_xthresh_V[chosen_v_id]
 
@@ -144,8 +161,12 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
         return (None, None, None, None, None, None)
 
     ## TODO assemble the left and right child datasets
-    x_LF, y_L = None, None # TODO fixme
-    x_RF, y_R = None, None # TODO fixme
+    left_mask_N = x_NF[:, best_feat_id] < best_thresh_val
+    right_mask_N = np.logical_not(left_mask_N)
+    
+    
+    x_LF, y_L = x_NF[left_mask_N], y_N[left_mask_N] # TODO fixme
+    x_RF, y_R = x_NF[right_mask_N], y_N[right_mask_N] # TODO fixme
 
     # TODO should verify your cost computation:
     # Just to make sure you've done everything right.
@@ -153,4 +174,9 @@ def select_best_binary_split(x_NF, y_N, MIN_SAMPLES_LEAF=1):
     # >>> right_cost = np.sum(np.square(y_R - np.mean(y_R)))
     # >>> assert np.allclose(cost_F[best_feat_id], left_cost + right_cost)
 
-    return (best_feat_id, best_thresh_val, x_LF, y_L, x_RF, y_R)
+    return (int(best_feat_id), best_thresh_val, x_LF, y_L, x_RF, y_R)
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
