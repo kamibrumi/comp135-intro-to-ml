@@ -37,6 +37,14 @@ array([[0.007, 0.   , 0.   ],
 
 import numpy as np
 
+def sqexp_kernel(x_F, x_train_F, length_scale):
+    sum = np.sum(np.square(x_train_F - x_F))
+    #print('sum', sum)
+    #print('- sum * 1.0 / np.square(length_scale)', - sum * 1.0 / np.square(length_scale))
+    k_QN = np.exp(- sum * 1.0 / np.square(length_scale))
+    #print('k_qn', k_QN)
+    return k_QN
+
 def calc_sqexp_kernel(x_QF, x_train_NF=None, length_scale=1.0):
     ''' Evaluate squared-exponential kernel matrix between two datasets.
 
@@ -67,10 +75,19 @@ def calc_sqexp_kernel(x_QF, x_train_NF=None, length_scale=1.0):
     assert F == F2
 
     k_QN = np.zeros((Q, N))
+    #print(k_QN)
     # TODO compute kernel between rows of x_QF and rows of x_train_NF
+    for q in range(Q):
+        for n in range(N):
+            k_QN[q][n] = sqexp_kernel(x_QF[q, :], x_train_NF[n, :], length_scale)
+            #print('k_QN[q][n] =', k_QN[q][n])
 
     # Ensure the kernel matrix positive definite
     # By adding a small positive to the diagonal
     M = np.minimum(Q, N)
     k_QN[:M, :M] += 1e-08 * np.eye(M)
     return k_QN
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
