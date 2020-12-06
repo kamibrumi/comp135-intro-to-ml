@@ -47,6 +47,12 @@ array([[0.883, 0.889, 0.9  ],
 
 import numpy as np
 
+def periodic_kernel(x_F, x_train_F, length_scale, period):
+    sum = np.sum(np.square(np.sin(np.pi*(x_train_F - x_F)/period)))
+    k_QN = np.exp(- 0.5*sum/np.square(length_scale))
+    return k_QN
+
+
 def calc_periodic_kernel(x_QF, x_train_NF=None, length_scale=1.0, period=1.0):
     ''' Evaluate periodic kernel to produce matrix between two datasets.
 
@@ -78,9 +84,17 @@ def calc_periodic_kernel(x_QF, x_train_NF=None, length_scale=1.0, period=1.0):
     
     k_QN = np.zeros((Q, N))
     # TODO compute kernel between rows of x_QF and rows of x_train_NF
+    for q in range(Q):
+        for n in range(N):
+            k_QN[q][n] = periodic_kernel(x_QF[q, :], x_train_NF[n, :], length_scale, period)
 
     # Ensure the kernel matrix positive definite
     # By adding a small positive to the diagonal
     M = np.minimum(Q, N)
     k_QN[:M, :M] += 1e-08 * np.eye(M)
     return k_QN
+
+
+if __name__ == '__main__':
+    import doctest
+    doctest.testmod()
