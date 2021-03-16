@@ -55,11 +55,13 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # TIP: use self.n_factors to access number of hidden dimensions
         self.param_dict = dict(
             mu=ag_np.ones(1),
-            b_per_user=ag_np.ones(1), # FIX dimensionality
-            c_per_item=ag_np.ones(1), # FIX dimensionality
-            U=0.001 * random_state.randn(1), # FIX dimensionality
-            V=0.001 * random_state.randn(1), # FIX dimensionality
+            b_per_user=ag_np.ones(n_users), # FIX dimensionality
+            c_per_item=ag_np.ones(n_items), # FIX dimensionality
+            U=0.001 * random_state.randn(n_users, self.n_factors), # FIX dimensionality
+            V=0.001 * random_state.randn(n_items, self.n_factors), # FIX dimensionality
             )
+        print(self.param_dict['U'].shape)
+        print(self.param_dict['V'].shape)
 
 
     def predict(self, user_id_N, item_id_N,
@@ -81,8 +83,22 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
             Entry n is for the n-th pair of user_id, item_id values provided.
         '''
         # TODO: Update with actual prediction logic
+        if mu is None:
+            mu = self.param_dict['mu']  
+        if b_per_user is None:
+            b_per_user = self.param_dict['b_per_user']           
+        if c_per_item is None:
+            c_per_item = self.param_dict['c_per_item']
+        if U is None:
+            U = self.param_dict['U']
+        if V is None:
+            V = self.param_dict['V']
+        
         N = user_id_N.size
         yhat_N = ag_np.ones(N)
+        yhat_N = yhat_N * mu + b_per_user[user_id_N] + c_per_item[item_id_N] + ag_np.einsum('ij,ij->i', U[user_id_N], V[item_id_N])
+
+        
         return yhat_N
 
 
@@ -103,7 +119,10 @@ class CollabFilterOneVectorPerItem(AbstractBaseCollabFilterSGD):
         # TIP: use self.alpha to access regularization strength
         y_N = data_tuple[2]
         yhat_N = self.predict(data_tuple[0], data_tuple[1], **param_dict)
-        loss_total = 0.0
+        U = param_dict['U']
+        V = param_dict['V']
+        #loss_total = self.alpha * (ag_np.sum(ag_np.square(U)) + ag_np.sum(ag_np.square(V))) + ag_np.sum(ag_np.square(yhat_N - y_N))
+        loss_total = self.alpha * (ag_np.sum(ag_np.square(U)) + ag_np.sum(ag_np.square(V))) + ag_np.sum(ag_np.abs(yhat_N - y_N))
         return loss_total    
 
 

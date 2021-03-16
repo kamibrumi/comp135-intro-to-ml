@@ -68,6 +68,9 @@ class CollabFilterMeanOnly(AbstractBaseCollabFilterSGD):
             Entry n is for the n-th pair of user_id, item_id values provided.
         '''
         # TODO: Update with actual prediction logic
+        if mu is None:
+            mu = self.param_dict['mu']  
+        
         N = user_id_N.size
         yhat_N = mu * ag_np.ones(N)
         return yhat_N
@@ -88,7 +91,8 @@ class CollabFilterMeanOnly(AbstractBaseCollabFilterSGD):
         # TODO compute loss
         y_N = data_tuple[2]
         yhat_N = self.predict(data_tuple[0], data_tuple[1], **param_dict)
-        loss_total = ag_np.mean(ag_np.square(yhat_N - y_N))
+        #loss_total = ag_np.sum(ag_np.square(yhat_N - y_N))
+        loss_total = ag_np.sum(ag_np.abs(yhat_N - y_N))
         return loss_total
 
     
